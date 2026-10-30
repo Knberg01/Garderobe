@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Garderobe</title>
+<meta name="theme-color" content="#2F5D50">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+:root{--bg:#ECEEE9;--surf:#fff;--ink:#1E2624;--mut:#66706C;--line:#D5DAD5;--acc:#2F5D50;--acc-ink:#fff;--dan:#B3402F;--chip:#DFE5DF;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141917;--surf:#1E2522;--ink:#E8ECE9;--mut:#9AA6A1;--line:#2F3834;--acc:#7FB8A4;--acc-ink:#10201A;--dan:#E07A68;--chip:#2A332F}}
+:root[data-theme="dark"]{--bg:#141917;--surf:#1E2522;--ink:#E8ECE9;--mut:#9AA6A1;--line:#2F3834;--acc:#7FB8A4;--acc-ink:#10201A;--dan:#E07A68;--chip:#2A332F}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.4 "Avenir Next","Segoe UI",system-ui,sans-serif}
+body{min-height:100vh;padding-bottom:96px}
+header{padding:20px 16px 8px}
+h1{margin:0;font-size:30px;letter-spacing:-.02em;font-weight:750}
+#count{color:var(--mut);font-size:14px;margin-top:2px}
+#warn{margin:8px 16px;padding:10px 12px;border-radius:10px;background:var(--chip);font-size:14px}
+#tags{display:flex;gap:8px;overflow-x:auto;padding:10px 16px;scrollbar-width:none;position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);z-index:5}
+#tags::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1px solid var(--line);background:transparent;color:var(--ink);padding:7px 13px;border-radius:999px;font:inherit;font-size:14px;cursor:pointer}
+.chip.on{background:var(--acc);color:var(--acc-ink);border-color:var(--acc)}
+#grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:6px;padding:6px 16px}
+.cell{position:relative;aspect-ratio:1;border-radius:10px;overflow:hidden;background:var(--chip);border:0;padding:0;cursor:pointer}
+.cell img{width:100%;height:100%;object-fit:cover;display:block}
+.cell.sel{outline:3px solid var(--acc);outline-offset:-3px}
+.cell .ck{position:absolute;top:6px;right:6px;width:22px;height:22px;border-radius:50%;background:var(--acc);color:var(--acc-ink);font-size:14px;display:none;align-items:center;justify-content:center;font-weight:700}
+.cell.sel .ck{display:flex}
+#empty{text-align:center;color:var(--mut);padding:56px 32px}
+#bar{position:fixed;left:0;right:0;bottom:0;padding:10px 12px calc(10px + env(safe-area-inset-bottom,0px));background:var(--surf);border-top:1px solid var(--line);display:flex;gap:8px;align-items:center;z-index:10}
+.btn{font:inherit;font-size:15px;font-weight:600;border-radius:12px;padding:12px 16px;border:1px solid var(--line);background:var(--surf);color:var(--ink);cursor:pointer;text-align:center;display:inline-block}
+.btn.pri{background:var(--acc);color:var(--acc-ink);border-color:var(--acc)}
+.btn.dan{color:var(--dan)}
+.btn[disabled]{opacity:.4}
+#bar .btn{flex:1}
+#bar .grow{flex:2}
+#bar .info{flex:1;font-size:14px;color:var(--mut);text-align:center}
+.ov{position:fixed;inset:0;background:rgba(10,15,13,.55);z-index:20;display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:var(--surf);width:100%;max-width:520px;border-radius:20px 20px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom,0px));max-height:85vh;overflow:auto}
+.sheet h2{margin:0 0 12px;font-size:19px}
+.sheet p{color:var(--mut);font-size:14px;margin:8px 0}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.row .btn{flex:1}
+.sheet input[type=text]{font:inherit;padding:11px 12px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);flex:1;min-width:0}
+.det{position:fixed;inset:0;background:var(--bg);z-index:25;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px)}
+.det .pic{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:8px;background:#0c100e}
+.det .pic img{max-width:100%;max-height:100%;object-fit:contain}
+.det .meta{padding:12px 16px calc(14px + env(safe-area-inset-bottom,0px))}
+.det .chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;min-height:32px}
+.tg{background:var(--chip);border-radius:999px;padding:5px 11px;font-size:14px}
+.det .row{margin:0}
+.toast{position:fixed;left:50%;bottom:calc(88px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-size:14px;z-index:40;max-width:90%}
+input[type=file]{display:none}
+</style>
+</head>
+<body>
+<header><h1>Garderobe</h1><div id="count"></div></header>
+<div id="warn" hidden></div>
+<div id="tags"></div>
+<main id="grid"></main>
+<div id="empty" hidden></div>
+<nav id="bar"></nav>
+<input type="file" id="fGal" accept="image/*" multiple>
+<input type="file" id="fCam" accept="image/*" capture="environment">
+<input type="file" id="fBak" accept=".json,application/json">
+<script>
+const $=s=>document.querySelector(s);
+function el(t,p,...k){const e=document.createElement(t);if(p)for(const a in p){if(a==='class')e.className=p[a];else if(a.startsWith('on'))e[a]=p[a];else e.setAttribute(a,p[a])}for(const c of k.flat())if(c!=null)e.append(c.nodeType?c:document.createTextNode(c));return e}
+let db=null,items=[],sel=new Set(),selMode=false,filter=new Set(),urls=new Map(),noTag=false;
+
+/* ---------- lagring ---------- */
+function openDb(){return new Promise(res=>{try{const r=indexedDB.open('garderobe',1);r.onupgradeneeded=()=>r.result.createObjectStore('items',{keyPath:'id'});r.onsuccess=()=>res(r.result);r.onerror=()=>res(null);r.onblocked=()=>res(null)}catch(e){res(null)}})}
+function dbRun(mode,fn){return new Promise((res,rej)=>{if(!db)return res();const t=db.transaction('items',mode);const r=fn(t.objectStore('items'));t.oncomplete=()=>res(r&&r.result);t.onerror=()=>rej(t.error)})}
+const save=i=>dbRun('readwrite',s=>s.put(i));
+const del=id=>dbRun('readwrite',s=>s.delete(id));
+function thumbUrl(i){if(!urls.has(i.id))urls.set(i.id,URL.createObjectURL(i.thumb));return urls.get(i.id)}
+function fullUrl(i){return URL.createObjectURL(i.full)}
+
+/* ---------- bilder ---------- */
+async function decode(file){if(window.createImageBitmap){try{return await createImageBitmap(file,{imageOrientation:'from-image'})}catch(e){}}
+return new Promise((res,rej)=>{const u=URL.createObjectURL(file),im=new Image();im.onload=()=>{URL.revokeObjectURL(u);res(im)};im.onerror=rej;im.src=u})}
+const toBlob=(c,q)=>new Promise(r=>c.toBlob(r,'image/jpeg',q));
+async function compress(src){
+  const w=src.width,h=src.height,m=Math.min(1,1200/Math.max(w,h));
+  const c=document.createElement('canvas');c.width=Math.round(w*m);c.height=Math.round(h*m);
+  const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(src,0,0,c.width,c.height);
+  const full=await toBlob(c,.78);
+  const s=Math.min(w,h),T=360,t=document.createElement('canvas');t.width=t.height=T;
+  const y=t.getContext('2d');y.fillStyle='#fff';y.fillRect(0,0,T,T);y.drawImage(src,(w-s)/2,(h-s)/2,s,s,0,0,T,T);
+  return {full,thumb:await toBlob(t,.7)}
+}
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+
+/* ---------- etiketter ---------- */
+const allTags=()=>[...new Set(items.flatMap(i=>i.tags))].sort((a,b)=>a.localeCompare(b,'nb'));
+function canon(t){t=t.trim().replace(/\s+/g,' ');if(!t)return '';const f=allTags().find(x=>x.toLowerCase()===t.toLowerCase());return f||t}
+const visible=()=>items.filter(i=>noTag?i.tags.length===0:[...filter].every(f=>i.tags.includes(f)));
+
+/* ---------- UI ---------- */
+function toast(m){const t=el('div',{class:'toast'},m);document.body.append(t);setTimeout(()=>t.remove(),2600)}
+function modal(build){const o=el('div',{class:'ov'}),s=el('div',{class:'sheet'});o.append(s);o.onclick=e=>{if(e.target===o)close()};const close=()=>o.remove();build(s,close);document.body.append(o);return close}
+
+function render(){
+  const v=visible(),tg=allTags();
+  $('#count').textContent=items.length?`${items.length} plagg${filter.size||noTag?` · viser ${v.length}`:''}`:'';
+  const bar=$('#tags');bar.replaceChildren();
+  if(items.length){
+    bar.append(el('button',{class:'chip'+(!filter.size&&!noTag?' on':''),onclick:()=>{filter.clear();noTag=false;render()}},'Alle'));
+    tg.forEach(t=>bar.append(el('button',{class:'chip'+(filter.has(t)?' on':''),onclick:()=>{noTag=false;filter.has(t)?filter.delete(t):filter.add(t);render()}},t)));
+    if(items.some(i=>!i.tags.length))bar.append(el('button',{class:'chip'+(noTag?' on':''),onclick:()=>{filter.clear();noTag=!noTag;render()}},'Uten etikett'));
+  }
+  const g=$('#grid');g.replaceChildren();
+  v.forEach(i=>{
+    const c=el('button',{class:'cell'+(sel.has(i.id)?' sel':''),'aria-label':'Bilde'},el('img',{src:thumbUrl(i),alt:'',loading:'lazy'}),el('span',{class:'ck'},'✓'));
+    let timer=null,long=false;
+    c.onpointerdown=()=>{long=false;timer=setTimeout(()=>{long=true;if(!selMode)startSel();toggle(i.id)},450)};
+    c.onpointerup=c.onpointerleave=c.onpointercancel=()=>clearTimeout(timer);
+    c.oncontextmenu=e=>e.preventDefault();
+    c.onclick=()=>{if(long){long=false;return}selMode?toggle(i.id):detail(i)};
+    g.append(c);
+  });
+  const em=$('#empty');em.hidden=!!v.length;
+  em.textContent=items.length?'Ingen bilder med denne etiketten.':'Ingen bilder ennå. Trykk «Legg til» for å velge bilder fra galleriet eller ta et nytt.';
+  bottom();
+}
+function bottom(){
+  const b=$('#bar');b.replaceChildren();
+  if(selMode){
+    b.append(el('button',{class:'btn',onclick:endSel},'Avbryt'),
+      el('span',{class:'info'},`${sel.size} valgt`),
+      el('button',{class:'btn pri',disabled:!sel.size||null,onclick:bulkAdd},'Etikett'),
+      el('button',{class:'btn',disabled:!sel.size||null,onclick:bulkRemove},'Fjern'),
+      el('button',{class:'btn dan',disabled:!sel.size||null,onclick:bulkDelete},'Slett'));
+    if(!sel.size){[...b.querySelectorAll('button')].forEach(x=>x.disabled=x.textContent==='Avbryt'?false:true)}
+  }else{
+    b.append(el('button',{class:'btn pri grow',onclick:addSheet},'Legg til'),
+      el('button',{class:'btn',onclick:startSel},'Velg'),
+      el('button',{class:'btn',onclick:backupSheet},'Sikkerhetskopi'));
+  }
+}
+function startSel(){selMode=true;sel.clear();render()}
+function endSel(){selMode=false;sel.clear();render()}
+function toggle(id){sel.has(id)?sel.delete(id):sel.add(id);render()}
+
+/* ---------- etikettvelger ---------- */
+function pickTags({title,initial=[],pool,allowNew=true,label='Lagre',note}){
+  return new Promise(res=>{
+    const chosen=new Set(initial);let done=false;
+    const fin=(v,close)=>{if(done)return;done=true;close();res(v)};
+    const close=modal((s,cl)=>{
+      const list=el('div',{class:'row'}),inp=el('input',{type:'text',placeholder:'Ny etikett',maxlength:'40'});
+      const draw=()=>{list.replaceChildren();const names=[...new Set([...(pool||allTags()),...chosen])].sort((a,b)=>a.localeCompare(b,'nb'));
+        if(!names.length)list.append(el('p',null,'Ingen etiketter ennå. Skriv inn en under.'));
+        names.forEach(t=>list.append(el('button',{class:'chip'+(chosen.has(t)?' on':''),onclick:()=>{chosen.has(t)?chosen.delete(t):chosen.add(t);draw()}},t)))};
+      const add=()=>{const t=canon(inp.value);if(t){chosen.add(t);inp.value='';draw()}};
+      inp.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();add()}};
+      s.append(el('h2',null,title));if(note)s.append(el('p',null,note));s.append(list);
+      if(allowNew)s.append(el('div',{class:'row'},inp,el('button',{class:'btn',style:'flex:none',onclick:add},'Legg til')));
+      s.append(el('div',{class:'row'},el('button',{class:'btn',onclick:()=>fin(null,cl)},'Avbryt'),el('button',{class:'btn pri',onclick:()=>{add();fin([...chosen],cl)}},label)));
+      draw();
+    });
+    // lukk ved trykk utenfor
+    document.querySelector('.ov:last-child').addEventListener('click',e=>{if(e.target.classList.contains('ov'))fin(null,close)});
+  });
+}
+
+/* ---------- legg til ---------- */
+function addSheet(){
+  modal((s,cl)=>{
+    s.append(el('h2',null,'Legg til bilder'),
+      el('div',{class:'row'},el('button',{class:'btn pri',onclick:()=>{cl();$('#fGal').click()}},'Velg fra galleri'),el('button',{class:'btn',onclick:()=>{cl();$('#fCam').click()}},'Ta bilde')),
+      el('p',null,'Du kan velge mange bilder samtidig. De forminskes automatisk før lagring.'));
+  });
+}
+async function ingest(files){
+  files=[...files].filter(f=>f.type.startsWith('image/')||/\.(jpe?g|png|webp|heic|heif)$/i.test(f.name));
+  if(!files.length)return;
+  const pr=el('p',null,''),ov=modal(s=>s.append(el('h2',null,'Komprimerer bilder'),pr));
+  const out=[];let fail=0;
+  for(let n=0;n<files.length;n++){
+    pr.textContent=`${n+1} av ${files.length}`;
+    try{const src=await decode(files[n]);const r=await compress(src);if(src.close)src.close();out.push(r)}catch(e){fail++}
+    await new Promise(r=>setTimeout(r));
+  }
+  ov();
+  if(!out.length){toast('Kunne ikke lese bildene.');return}
+  const tags=await pickTags({title:`Etikett for ${out.length} ${out.length===1?'bilde':'bilder'}`,note:'Valgfritt. Etikettene gjelder alle bildene i denne omgangen.',label:`Lagre ${out.length}`});
+  if(tags===null){toast('Avbrutt. Ingenting er lagret.');return}
+  const now=Date.now();
+  for(let n=0;n<out.length;n++){const it={id:uid(),tags:[...tags],added:now+n,full:out[n].full,thumb:out[n].thumb};items.push(it);try{await save(it)}catch(e){toast('Lagring feilet for ett bilde.')}}
+  items.sort((a,b)=>b.added-a.added);render();
+  toast(`${out.length} lagret${fail?`, ${fail} kunne ikke leses`:''}`);
+}
+$('#fGal').onchange=e=>{ingest(e.target.files);e.target.value=''};
+$('#fCam').onchange=e=>{ingest(e.target.files);e.target.value=''};
+
+/* ---------- detalj ---------- */
+function detail(i){
+  const u=fullUrl(i),d=el('div',{class:'det'}),chips=el('div',{class:'chips'});
+  const closeD=()=>{URL.revokeObjectURL(u);d.remove()};
+  const draw=()=>{chips.replaceChildren();if(!i.tags.length)chips.append(el('span',{class:'tg'},'Uten etikett'));i.tags.forEach(t=>chips.append(el('span',{class:'tg'},t)))};
+  d.append(el('div',{class:'pic'},el('img',{src:u,alt:''})),
+    el('div',{class:'meta'},chips,el('div',{class:'row'},
+      el('button',{class:'btn',onclick:closeD},'Lukk'),
+      el('button',{class:'btn pri',onclick:async()=>{const t=await pickTags({title:'Etiketter',initial:i.tags});if(t){i.tags=t;await save(i);draw();render()}}},'Etiketter'),
+      el('button',{class:'btn dan',onclick:async()=>{if(!confirm('Slette dette bildet?'))return;await del(i.id);items=items.filter(x=>x!==i);urls.delete(i.id);closeD();render()}},'Slett'))));
+  draw();document.body.append(d);
+}
+
+/* ---------- valg-handlinger ---------- */
+const picked=()=>items.filter(i=>sel.has(i.id));
+async function bulkAdd(){
+  const t=await pickTags({title:`Legg til etikett på ${sel.size}`,label:'Legg til'});
+  if(!t||!t.length)return;
+  for(const i of picked()){i.tags=[...new Set([...i.tags,...t])];await save(i)}
+  endSel();toast('Etikett lagt til');
+}
+async function bulkRemove(){
+  const pool=[...new Set(picked().flatMap(i=>i.tags))];
+  if(!pool.length){toast('De valgte bildene har ingen etiketter.');return}
+  const t=await pickTags({title:'Fjern etiketter',pool,allowNew:false,label:'Fjern',note:'Marker etikettene som skal fjernes fra de valgte bildene.'});
+  if(!t||!t.length)return;
+  for(const i of picked()){i.tags=i.tags.filter(x=>!t.includes(x));await save(i)}
+  filter=new Set([...filter].filter(f=>allTags().includes(f)));
+  endSel();toast('Etikett fjernet');
+}
+async function bulkDelete(){
+  if(!confirm(`Slette ${sel.size} bilder? Dette kan ikke angres.`))return;
+  for(const i of picked()){await del(i.id);urls.delete(i.id)}
+  items=items.filter(i=>!sel.has(i.id));filter=new Set([...filter].filter(f=>allTags().includes(f)));
+  endSel();toast('Slettet');
+}
+
+/* ---------- sikkerhetskopi ---------- */
+function lastBackup(){try{return localStorage.getItem('lastBackup')}catch(e){return null}}
+function backupSheet(){
+  modal((s,cl)=>{
+    const lb=lastBackup();
+    s.append(el('h2',null,'Sikkerhetskopi'),
+      el('p',null,lb?`Sist lagret: ${new Date(+lb).toLocaleString('nb-NO')}`:'Ingen sikkerhetskopi lagret ennå.'),
+      el('div',{class:'row'},el('button',{class:'btn pri',disabled:!items.length||null,onclick:()=>{cl();exportBak()}},'Lagre sikkerhetskopi'),
+        el('button',{class:'btn',onclick:()=>{cl();$('#fBak').click()}},'Gjenopprett fra fil')),
+      el('p',null,'Velg Google Drive i delingsmenyen hvis den dukker opp. Ellers havner filen i Nedlastinger på telefonen; last den da opp til Drive (Drive-appen → + → Last opp). For å gjenopprette velger du filen via «Gjenopprett fra fil», også fra Drive. Eksisterende bilder beholdes.'));
+  });
+}
+const b64=b=>new Promise(r=>{const f=new FileReader();f.onload=()=>r(f.result);f.readAsDataURL(b)});
+async function exportBak(){
+  const ov=modal(s=>s.append(el('h2',null,'Lager sikkerhetskopi'),el('p',null,'Et øyeblikk …')));
+  try{
+    const parts=['{"v":1,"items":['];
+    for(let n=0;n<items.length;n++){const i=items[n];parts.push((n?',':'')+JSON.stringify({id:i.id,tags:i.tags,added:i.added,img:await b64(i.full)}))}
+    parts.push(']}');ov();
+    const name=`garderobe-${new Date().toISOString().slice(0,10)}.json`;
+    const blob=new Blob(parts,{type:'application/json'});
+    let shared=false;
+    try{const f=new File([blob],name,{type:'application/json'});
+      if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:name});shared=true}}
+    catch(e){if(e&&e.name==='AbortError')return}
+    if(!shared){const u=URL.createObjectURL(blob),a=el('a',{href:u,download:name});document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),60000)}
+    try{localStorage.setItem('lastBackup',String(Date.now()))}catch(e){}
+    toast(shared?'Delt. Velg Google Drive hvis den vises.':'Lagret i Nedlastinger. Last den opp til Google Drive.');
+  }catch(e){ov();toast('Kunne ikke lage filen.')}
+}
+async function importBak(file){
+  try{
+    const j=JSON.parse(await file.text());if(!j||!Array.isArray(j.items))throw 0;
+    const have=new Set(items.map(i=>i.id));let n=0;
+    const ov=modal(s=>s.append(el('h2',null,'Gjenoppretter'),el('p',null,'Et øyeblikk …')));
+    for(const r of j.items){
+      if(have.has(r.id)||typeof r.img!=='string')continue;
+      const bin=atob(r.img.split(',')[1]),a=new Uint8Array(bin.length);for(let k=0;k<bin.length;k++)a[k]=bin.charCodeAt(k);
+      const full=new Blob([a],{type:'image/jpeg'}),src=await decode(full),c=await compress(src);if(src.close)src.close();
+      const it={id:r.id,tags:Array.isArray(r.tags)?r.tags.map(String):[],added:r.added||Date.now(),full,thumb:c.thumb};
+      items.push(it);await save(it);n++;
+    }
+    ov();items.sort((a,b)=>b.added-a.added);render();toast(`${n} bilder gjenopprettet`);
+  }catch(e){toast('Filen er ikke en gyldig sikkerhetskopi.')}
+}
+$('#fBak').onchange=e=>{if(e.target.files[0])importBak(e.target.files[0]);e.target.value=''};
+
+/* ---------- start ---------- */
+if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
+(async()=>{
+  db=await openDb();
+  if(!db){const w=$('#warn');w.hidden=false;w.textContent='Nettleseren tillater ikke varig lagring her. Bildene forsvinner når du lukker siden. Lag sikkerhetskopi underveis.'}
+  else try{items=await dbRun('readonly',s=>s.getAll())||[]}catch(e){items=[]}
+  items.sort((a,b)=>b.added-a.added);render();
+})();
+</script>
+</body>
+</html>
