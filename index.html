@@ -69,7 +69,7 @@ input[type=file]{display:none}
 <input type="file" id="fBak" accept=".json,application/json">
 <script>
 const $=s=>document.querySelector(s);
-function el(t,p,...k){const e=document.createElement(t);if(p)for(const a in p){if(a==='class')e.className=p[a];else if(a.startsWith('on'))e[a]=p[a];else e.setAttribute(a,p[a])}for(const c of k.flat())if(c!=null)e.append(c.nodeType?c:document.createTextNode(c));return e}
+function el(t,p,...k){const e=document.createElement(t);if(p)for(const a in p){if(p[a]==null||p[a]===false)continue;if(a==='class')e.className=p[a];else if(a.startsWith('on'))e[a]=p[a];else e.setAttribute(a,p[a])}for(const c of k.flat())if(c!=null)e.append(c.nodeType?c:document.createTextNode(c));return e}
 let db=null,items=[],sel=new Set(),selMode=false,filter=new Set(),urls=new Map(),noTag=false;
 
 /* ---------- lagring ---------- */
