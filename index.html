@@ -4,15 +4,15 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Garderobe</title>
-<meta name="theme-color" content="#2F5D50">
+<meta name="theme-color" content="#6E3A63">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-v2-192.png">
 <link rel="apple-touch-icon" href="icon-v2-192.png">
 <style>
-:root{--bg:#ECEEE9;--surf:#fff;--ink:#1E2624;--mut:#66706C;--line:#D5DAD5;--acc:#2F5D50;--acc-ink:#fff;--dan:#B3402F;--chip:#DFE5DF;
+:root{--bg:#F6F0F3;--surf:#fff;--ink:#2A1F28;--mut:#6F5F6B;--line:#E0D3DB;--acc:#6E3A63;--acc-ink:#fff;--dan:#B3402F;--chip:#EBDFE6;--gold:#F2C14E;--gold-ink:#4A2543;--frame:rgba(110,58,99,.30);
 box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141917;--surf:#1E2522;--ink:#E8ECE9;--mut:#9AA6A1;--line:#2F3834;--acc:#7FB8A4;--acc-ink:#10201A;--dan:#E07A68;--chip:#2A332F}}
-:root[data-theme="dark"]{--bg:#141917;--surf:#1E2522;--ink:#E8ECE9;--mut:#9AA6A1;--line:#2F3834;--acc:#7FB8A4;--acc-ink:#10201A;--dan:#E07A68;--chip:#2A332F}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1C141B;--surf:#271C26;--ink:#F1E8EF;--mut:#B7A5B3;--line:#3A2C38;--acc:#F2C14E;--acc-ink:#2A1426;--dan:#E07A68;--chip:#33252F;--frame:rgba(242,193,78,.32)}}
+:root[data-theme="dark"]{--bg:#1C141B;--surf:#271C26;--ink:#F1E8EF;--mut:#B7A5B3;--line:#3A2C38;--acc:#F2C14E;--acc-ink:#2A1426;--dan:#E07A68;--chip:#33252F;--frame:rgba(242,193,78,.32)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.4 "Avenir Next","Segoe UI",system-ui,sans-serif}
 body{min-height:100vh;padding-bottom:96px}
@@ -25,10 +25,10 @@ h1{margin:0;font-size:30px;letter-spacing:-.02em;font-weight:750}
 .chip{flex:none;border:1px solid var(--line);background:transparent;color:var(--ink);padding:7px 13px;border-radius:999px;font:inherit;font-size:14px;cursor:pointer}
 .chip.on{background:var(--acc);color:var(--acc-ink);border-color:var(--acc)}
 #grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:6px;padding:6px 16px}
-.cell{position:relative;aspect-ratio:1;border-radius:10px;overflow:hidden;background:var(--chip);border:0;padding:0;cursor:pointer}
+.cell{position:relative;aspect-ratio:1;border-radius:10px;overflow:hidden;background:var(--chip);border:1px solid var(--frame);padding:0;cursor:pointer}
 .cell img{width:100%;height:100%;object-fit:cover;display:block}
 .cell.sel{outline:3px solid var(--acc);outline-offset:-3px}
-.cell .ck{position:absolute;top:6px;right:6px;width:22px;height:22px;border-radius:50%;background:var(--acc);color:var(--acc-ink);font-size:14px;display:none;align-items:center;justify-content:center;font-weight:700}
+.cell .ck{position:absolute;top:6px;right:6px;width:22px;height:22px;border-radius:50%;background:var(--gold,#F2C14E);color:var(--gold-ink,#2A1426);font-size:14px;display:none;align-items:center;justify-content:center;font-weight:700}
 .cell.sel .ck{display:flex}
 #empty{text-align:center;color:var(--mut);padding:56px 32px}
 #bar{position:fixed;left:0;right:0;bottom:0;padding:10px 12px calc(10px + env(safe-area-inset-bottom,0px));background:var(--surf);border-top:1px solid var(--line);display:flex;gap:8px;align-items:center;z-index:10}
@@ -47,8 +47,8 @@ h1{margin:0;font-size:30px;letter-spacing:-.02em;font-weight:750}
 .row .btn{flex:1}
 .sheet input[type=text]{font:inherit;padding:11px 12px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);flex:1;min-width:0}
 .det{position:fixed;inset:0;background:var(--bg);z-index:25;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px)}
-.det .pic{position:relative;touch-action:pan-y;flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:8px;background:#0c100e}
-.det .pic img{max-width:100%;max-height:100%;object-fit:contain}
+.det .pic{position:relative;touch-action:pan-y;flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:8px;background:#150F14}
+.det .pic img{max-width:100%;max-height:100%;object-fit:contain;border:1px solid var(--frame);border-radius:6px}
 .nav{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:64px;border:0;border-radius:12px;background:rgba(0,0,0,.45);color:#fff;font-size:34px;line-height:1;cursor:pointer}
 .nav.l{left:8px}.nav.r{right:8px}.nav[hidden]{display:none}
 .pos{position:absolute;top:10px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.5);color:#fff;font-size:13px;padding:3px 10px;border-radius:999px}
